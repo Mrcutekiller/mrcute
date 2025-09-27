@@ -77,6 +77,7 @@ const outdoorCameras = [
 export function ProductsSection() {
   const [isVisible, setIsVisible] = useState(false)
   const [showTransitionCamera, setShowTransitionCamera] = useState(false)
+  const [highlightHikvision, setHighlightHikvision] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -94,7 +95,23 @@ export function ProductsSection() {
       observer.observe(sectionRef.current)
     }
 
-    return () => observer.disconnect()
+    const handleCameraLanding = (event: CustomEvent) => {
+      if (event.detail.target === "hikvision-bullet") {
+        setHighlightHikvision(true)
+        const outdoorTab = document.querySelector('[value="outdoor"]') as HTMLButtonElement
+        if (outdoorTab) {
+          outdoorTab.click()
+        }
+        setTimeout(() => setHighlightHikvision(false), 3000)
+      }
+    }
+
+    window.addEventListener("cameraLanding", handleCameraLanding as EventListener)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("cameraLanding", handleCameraLanding as EventListener)
+    }
   }, [])
 
   const CameraGrid = ({ cameras, type }: { cameras: typeof indoorCameras; type: "indoor" | "outdoor" }) => (
@@ -104,6 +121,10 @@ export function ProductsSection() {
           key={camera.name}
           className={`group hover:shadow-xl transition-all duration-300 hover:scale-105 bg-card border-border hover:border-primary/50 hover:shadow-primary/10 ${
             isVisible ? "animate-fade-in-up" : "opacity-0 translate-y-10"
+          } ${
+            camera.name === "Hikvision Bullet" && highlightHikvision
+              ? "ring-4 ring-yellow-400 shadow-2xl shadow-yellow-400/50 scale-110 bg-gradient-to-br from-yellow-50 to-green-50"
+              : ""
           }`}
           style={{ animationDelay: `${index * 150}ms` }}
         >
@@ -117,15 +138,28 @@ export function ProductsSection() {
                 className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
               />
               <div className="absolute top-4 left-4">
-                <Badge className={`${type === "indoor" ? "bg-primary" : "bg-accent"} text-white`}>
+                <Badge
+                  className={`${type === "indoor" ? "bg-primary" : "bg-accent"} text-white ${
+                    camera.name === "Hikvision Bullet" && highlightHikvision ? "bg-yellow-500 animate-pulse" : ""
+                  }`}
+                >
                   {type === "indoor" ? "Indoor" : "Outdoor"}
+                  {camera.name === "Hikvision Bullet" && highlightHikvision && <span className="ml-1">⭐</span>}
                 </Badge>
               </div>
-              {/* Hover glow effect */}
               <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-all duration-300 group-hover:shadow-inner group-hover:shadow-primary/25" />
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-bold text-foreground mb-2">{camera.name}</h3>
+              <h3
+                className={`text-xl font-bold text-foreground mb-2 ${
+                  camera.name === "Hikvision Bullet" && highlightHikvision ? "text-yellow-600" : ""
+                }`}
+              >
+                {camera.name}
+                {camera.name === "Hikvision Bullet" && highlightHikvision && (
+                  <span className="ml-2 text-yellow-500 animate-bounce">🎯</span>
+                )}
+              </h3>
               <p className="text-muted-foreground mb-4 text-sm">{camera.description}</p>
               <div className="space-y-2 mb-4">
                 {camera.features.map((feature, idx) => (
