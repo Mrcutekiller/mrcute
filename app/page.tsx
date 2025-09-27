@@ -1,15 +1,17 @@
 import { HeroSection } from "@/components/hero-section"
-import { ServicesPreview } from "@/components/services-preview"
-import { WhyChooseUs } from "@/components/why-choose-us"
-import { CallToAction } from "@/components/call-to-action"
+import { AboutSection } from "@/components/about-section"
+import { ProductsSection } from "@/components/products-section"
+import { ServicesSection } from "@/components/services-section"
+import { ContactSection } from "@/components/contact-section"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
       <HeroSection />
-      <ServicesPreview />
-      <WhyChooseUs />
-      <CallToAction />
+      <AboutSection />
+      <ProductsSection />
+      <ServicesSection />
+      <ContactSection />
     </div>
   )
 }

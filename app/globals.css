@@ -184,6 +184,45 @@
     }
   }
 
+  @keyframes dropDownBounce {
+    0% {
+      transform: translateY(-200px) scale(0.5);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(10px) scale(1.05);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(-5px) scale(0.98);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.4);
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite;
   }
@@ -202,5 +241,17 @@
 
   .animate-drop-down {
     animation: dropDown 1s ease-out;
+  }
+
+  .animate-drop-down-bounce {
+    animation: dropDownBounce 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
   }
 }

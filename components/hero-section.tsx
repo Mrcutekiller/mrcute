@@ -2,11 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield } from "lucide-react"
+import Image from "next/image"
+
+// Simple SVG arrow icon
+const ArrowRightIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+)
 
 export function HeroSection() {
   const [displayText, setDisplayText] = useState("")
   const [showCamera, setShowCamera] = useState(false)
+  const [textComplete, setTextComplete] = useState(false)
   const fullText = "Your Safety, Our Mission"
   const typingSpeed = 100
 
@@ -18,8 +26,10 @@ export function HeroSection() {
         index++
       } else {
         clearInterval(timer)
-        // Show camera after typing is complete
-        setTimeout(() => setShowCamera(true), 500)
+        setTextComplete(true)
+        setTimeout(() => {
+          setShowCamera(true)
+        }, 1000)
       }
     }, typingSpeed)
 
@@ -27,7 +37,10 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-secondary/20">
+    <section
+      id="home"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-secondary/20"
+    >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
@@ -36,47 +49,64 @@ export function HeroSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8">
-          {/* Typing Animation */}
+          {/* Typing Animation with Morphing Effect */}
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-foreground">
+            <h1
+              className={`text-4xl sm:text-6xl lg:text-7xl font-bold transition-all duration-1000 ${
+                showCamera ? "opacity-0 -translate-y-20 scale-75" : "opacity-100 translate-y-0 scale-100"
+              }`}
+            >
               <span className="text-primary">{displayText}</span>
-              <span className="animate-pulse text-accent">|</span>
+              {!textComplete && <span className="animate-pulse text-accent">|</span>}
             </h1>
-            <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto">
-              Professional security camera installation, sales, and maintenance services in Addis Ababa
-            </p>
+
+            {!showCamera && (
+              <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto animate-fade-in-up">
+                Professional security camera installation, sales, and maintenance services in Addis Ababa
+              </p>
+            )}
           </div>
 
           {/* 3D Security Camera Animation */}
           {showCamera && (
-            <div className="flex justify-center animate-drop-down">
-              <div className="relative">
-                <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-primary to-accent rounded-lg shadow-2xl animate-glow flex items-center justify-center">
-                  <Shield className="w-16 h-16 sm:w-20 sm:h-20 text-primary-foreground" />
+            <div className="flex flex-col items-center space-y-8">
+              <div className="animate-drop-down-bounce">
+                <div className="relative group">
+                  <div className="w-64 h-64 sm:w-80 sm:h-80 relative">
+                    <Image
+                      src="/security-camera-hero.png"
+                      alt="Security Camera"
+                      fill
+                      className="object-contain drop-shadow-2xl"
+                      priority
+                    />
+                    {/* Glowing effect */}
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl scale-75 animate-pulse-glow" />
+                    <div
+                      className="absolute inset-0 bg-accent/10 rounded-full blur-2xl scale-90 animate-pulse-glow"
+                      style={{ animationDelay: "0.5s" }}
+                    />
+                  </div>
                 </div>
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-primary/20 rounded-lg blur-xl scale-110 animate-pulse" />
               </div>
-            </div>
-          )}
 
-          {/* CTA Button */}
-          {showCamera && (
-            <div className="animate-fade-in-up">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold group"
-              >
-                Get Protected Now
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          )}
+              {/* Enhanced content after camera appears */}
+              <div className="animate-fade-in-up space-y-6" style={{ animationDelay: "0.5s" }}>
+                <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto">
+                  Professional security camera installation, sales, and maintenance services in Addis Ababa
+                </p>
 
-          {/* Company Tagline */}
-          {showCamera && (
-            <div className="animate-fade-in-up">
-              <p className="text-2xl sm:text-3xl font-bold text-accent mt-8">"Security is not an option."</p>
+                <Button
+                  size="lg"
+                  onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold group hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+                >
+                  Get Protected Now
+                  <ArrowRightIcon />
+                </Button>
+
+                <p className="text-2xl sm:text-3xl font-bold text-accent">"Security is not an option."</p>
+              </div>
             </div>
           )}
         </div>
