@@ -67,19 +67,21 @@ export function HeroSection() {
             )}
           </div>
 
-          {/* 3D Security Camera Animation */}
           {showCamera && (
             <div className="flex flex-col items-center space-y-8">
               <div className="animate-drop-down-bounce">
                 <div className="relative group">
                   <div className="w-64 h-64 sm:w-80 sm:h-80 relative">
-                    <Image
-                      src="/security-camera-hero.png"
-                      alt="Security Camera"
-                      fill
-                      className="object-contain drop-shadow-2xl"
-                      priority
-                    />
+                    {/* Camera sketch with continuous downward movement */}
+                    <div className="animate-float-down">
+                      <Image
+                        src="/camera-sketch.png"
+                        alt="Security Camera Movement Sketch"
+                        fill
+                        className="object-contain drop-shadow-2xl"
+                        priority
+                      />
+                    </div>
                     {/* Glowing effect */}
                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl scale-75 animate-pulse-glow" />
                     <div
