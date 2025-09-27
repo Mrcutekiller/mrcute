@@ -1,12 +1,18 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import { EnhancedFooter } from "@/components/enhanced-footer"
+import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.dev",
+  title: "Pin Trading - Security & Automation Solutions",
+  description:
+    "Professional security camera installation, sales, and maintenance services in Addis Ababa. Security is not an option.",
+  generator: "v0.app",
 }
 
 export default function RootLayout({
@@ -15,10 +21,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body>
-        {children}
-        <EnhancedFooter />
+    <html lang="en" className="dark">
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Navigation />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </Suspense>
+        <Analytics />
       </body>
     </html>
   )
