@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { HomeIcon, BuildingIcon, ShieldIcon } from "lucide-react"
 import Image from "next/image"
 
@@ -104,9 +103,14 @@ export function ProductsSection() {
           key={camera.name}
           className={`group hover:shadow-xl transition-all duration-300 hover:scale-105 bg-card border-border hover:border-primary/50 hover:shadow-primary/10 ${
             isVisible ? "animate-fade-in-up" : "opacity-0 translate-y-10"
-          }`}
+          } ${camera.name === "Hikvision Bullet" ? "ring-2 ring-yellow-400 ring-offset-2 relative" : ""}`}
           style={{ animationDelay: `${index * 150}ms` }}
         >
+          {camera.name === "Hikvision Bullet" && (
+            <div className="absolute -top-2 -right-2 z-10">
+              <Badge className="bg-gradient-to-r from-yellow-400 to-green-400 text-white animate-pulse">Featured</Badge>
+            </div>
+          )}
           <CardContent className="p-0">
             <div className="relative overflow-hidden rounded-t-lg">
               <Image
@@ -189,37 +193,31 @@ export function ProductsSection() {
           </p>
         </div>
 
-        <Tabs defaultValue="indoor" className="w-full">
-          <TabsList
-            className={`grid w-full grid-cols-2 mb-12 bg-white/80 backdrop-blur-sm border border-yellow-200 transition-all duration-700 ${
-              isVisible ? "animate-fade-in-up" : "opacity-0 translate-y-10"
-            }`}
-            style={{ animationDelay: "400ms" }}
-          >
-            <TabsTrigger
-              value="indoor"
-              className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:to-green-400 data-[state=active]:text-white"
-            >
-              <HomeIcon className="w-4 h-4" />
-              <span>Indoor Cameras</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="outdoor"
-              className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:to-green-400 data-[state=active]:text-white"
-            >
-              <BuildingIcon className="w-4 h-4" />
-              <span>Outdoor Cameras</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Outdoor Cameras Section */}
+        <div className="mb-20">
+          <div className="flex items-center justify-center mb-12">
+            <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm border border-yellow-200 rounded-full px-6 py-3">
+              <BuildingIcon className="w-6 h-6 text-yellow-600" />
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-green-600 bg-clip-text text-transparent">
+                Outdoor Cameras
+              </h3>
+            </div>
+          </div>
+          <CameraGrid cameras={outdoorCameras} type="outdoor" />
+        </div>
 
-          <TabsContent value="indoor">
-            <CameraGrid cameras={indoorCameras} type="indoor" />
-          </TabsContent>
-
-          <TabsContent value="outdoor">
-            <CameraGrid cameras={outdoorCameras} type="outdoor" />
-          </TabsContent>
-        </Tabs>
+        {/* Indoor Cameras Section */}
+        <div>
+          <div className="flex items-center justify-center mb-12">
+            <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm border border-yellow-200 rounded-full px-6 py-3">
+              <HomeIcon className="w-6 h-6 text-green-600" />
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-yellow-600 bg-clip-text text-transparent">
+                Indoor Cameras
+              </h3>
+            </div>
+          </div>
+          <CameraGrid cameras={indoorCameras} type="indoor" />
+        </div>
       </div>
     </section>
   )
