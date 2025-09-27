@@ -76,6 +76,7 @@ const outdoorCameras = [
 
 export function ProductsSection() {
   const [isVisible, setIsVisible] = useState(false)
+  const [showTransitionCamera, setShowTransitionCamera] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export function ProductsSection() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
+          setTimeout(() => setShowTransitionCamera(true), 500)
         }
       },
       { threshold: 0.1 },
@@ -151,18 +153,33 @@ export function ProductsSection() {
   )
 
   return (
-    <section id="products" ref={sectionRef} className="py-20">
+    <section id="products" ref={sectionRef} className="py-20 bg-gradient-to-br from-slate-50 to-emerald-50 relative">
+      {showTransitionCamera && (
+        <div className="absolute top-8 right-8 z-10 animate-drop-down-bounce">
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 to-green-500/30 rounded-full blur-lg animate-pulse" />
+            <Image
+              src="/security-camera-professional.png"
+              alt="Featured Security Camera"
+              fill
+              className="object-contain drop-shadow-xl"
+            />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping" />
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2
-            className={`text-3xl sm:text-4xl font-bold text-foreground mb-6 transition-all duration-700 ${
+            className={`text-3xl sm:text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-600 bg-clip-text text-transparent mb-6 transition-all duration-700 ${
               isVisible ? "animate-slide-in-left" : "opacity-0 -translate-x-20"
             }`}
           >
             Security Camera Products
           </h2>
           <p
-            className={`text-xl text-muted-foreground max-w-3xl mx-auto transition-all duration-700 ${
+            className={`text-xl text-gray-700 max-w-3xl mx-auto transition-all duration-700 ${
               isVisible ? "animate-slide-in-right" : "opacity-0 translate-x-20"
             }`}
             style={{ animationDelay: "200ms" }}
@@ -174,16 +191,22 @@ export function ProductsSection() {
 
         <Tabs defaultValue="indoor" className="w-full">
           <TabsList
-            className={`grid w-full grid-cols-2 mb-12 transition-all duration-700 ${
+            className={`grid w-full grid-cols-2 mb-12 bg-white/80 backdrop-blur-sm border border-yellow-200 transition-all duration-700 ${
               isVisible ? "animate-fade-in-up" : "opacity-0 translate-y-10"
             }`}
             style={{ animationDelay: "400ms" }}
           >
-            <TabsTrigger value="indoor" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="indoor"
+              className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:to-green-400 data-[state=active]:text-white"
+            >
               <HomeIcon className="w-4 h-4" />
               <span>Indoor Cameras</span>
             </TabsTrigger>
-            <TabsTrigger value="outdoor" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="outdoor"
+              className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:to-green-400 data-[state=active]:text-white"
+            >
               <BuildingIcon className="w-4 h-4" />
               <span>Outdoor Cameras</span>
             </TabsTrigger>
