@@ -66,7 +66,7 @@ export function OutdoorCameras() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 bg-secondary/10">
+    <section ref={sectionRef} data-section="outdoor-cameras" className="py-20 bg-secondary/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
@@ -82,9 +82,10 @@ export function OutdoorCameras() {
           {outdoorCameras.map((camera, index) => (
             <Card
               key={camera.name}
+              data-camera={camera.name === "Hikvision Bullet" ? "hikvision-bullet" : undefined}
               className={`group hover:shadow-xl transition-all duration-300 hover:scale-105 bg-card border-border hover:border-accent/50 ${
-                isVisible ? "animate-fade-in-up" : "opacity-0"
-              }`}
+                camera.name === "Hikvision Bullet" ? "ring-2 ring-yellow-400/50 shadow-lg shadow-yellow-400/20" : ""
+              } ${isVisible ? "animate-fade-in-up" : "opacity-0"}`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <CardContent className="p-0">
@@ -96,6 +97,9 @@ export function OutdoorCameras() {
                   />
                   <div className="absolute top-4 left-4">
                     <Badge className="bg-accent text-accent-foreground">Outdoor</Badge>
+                    {camera.name === "Hikvision Bullet" && (
+                      <Badge className="bg-yellow-400 text-yellow-900 ml-2 animate-pulse">Featured</Badge>
+                    )}
                   </div>
                 </div>
                 <div className="p-6">

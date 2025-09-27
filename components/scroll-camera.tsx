@@ -6,7 +6,7 @@ import Image from "next/image"
 export function ScrollCamera() {
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
-  const [currentStage, setCurrentStage] = useState("home")
+  const [currentSection, setCurrentSection] = useState("home")
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,95 +15,95 @@ export function ScrollCamera() {
 
       const servicesSection = document.getElementById("services")
       const productsSection = document.getElementById("products")
+      const outdoorSection = document.querySelector('[data-section="outdoor-cameras"]')
 
-      if (servicesSection && productsSection) {
+      if (servicesSection && productsSection && outdoorSection) {
         const servicesTop = servicesSection.offsetTop
         const productsTop = productsSection.offsetTop
-        const productsBottom = productsTop + productsSection.offsetHeight
+        const outdoorTop = outdoorSection.getBoundingClientRect().top + currentScrollY
+        const hikvisionBullet = document.querySelector('[data-camera="hikvision-bullet"]')
 
-        // Define scroll stages
         if (currentScrollY < servicesTop - 200) {
-          setCurrentStage("home")
+          setCurrentSection("home")
+          setIsVisible(true)
         } else if (currentScrollY < productsTop - 200) {
-          setCurrentStage("services")
-        } else if (currentScrollY < productsBottom - 400) {
-          setCurrentStage("products")
-        } else {
-          // Camera reaches outdoor cameras section and lands on Hikvision Bullet
-          setCurrentStage("landing")
+          setCurrentSection("services")
+          setIsVisible(true)
+        } else if (currentScrollY < outdoorTop - 100) {
+          setCurrentSection("products")
+          setIsVisible(true)
+        } else if (hikvisionBullet) {
+          // Hide scroll camera when reaching Hikvision Bullet position
+          setCurrentSection("hikvision")
           setIsVisible(false)
-
-          // Trigger highlight on Hikvision Bullet camera
-          const event = new CustomEvent("cameraLanding", { detail: { target: "hikvision-bullet" } })
-          window.dispatchEvent(event)
         }
       }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll() // Initial call
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const getCameraPosition = () => {
-    const baseY = scrollY * 0.6
-    const baseX = Math.sin(scrollY * 0.008) * 30
+    const baseSpeed = 0.3
+    const horizontalMovement = Math.sin(scrollY * 0.008) * 30
 
-    switch (currentStage) {
+    switch (currentSection) {
       case "home":
         return {
-          x: baseX,
-          y: baseY,
+          x: 20 + horizontalMovement,
+          y: 80 + scrollY * baseSpeed,
           rotation: scrollY * 0.05,
           scale: 1,
         }
       case "services":
         return {
-          x: baseX - 20,
-          y: baseY + 50,
+          x: 40 + horizontalMovement,
+          y: 80 + scrollY * baseSpeed,
           rotation: scrollY * 0.08,
           scale: 1.1,
         }
       case "products":
         return {
-          x: baseX + 10,
-          y: baseY + 100,
-          rotation: scrollY * 0.12,
+          x: 60 + horizontalMovement,
+          y: 80 + scrollY * baseSpeed,
+          rotation: scrollY * 0.1,
           scale: 1.2,
         }
       default:
         return {
-          x: baseX,
-          y: baseY,
-          rotation: scrollY * 0.05,
-          scale: 1,
+          x: 80 + horizontalMovement,
+          y: 80 + scrollY * baseSpeed,
+          rotation: scrollY * 0.12,
+          scale: 1.3,
         }
     }
   }
 
   const position = getCameraPosition()
-  const cameraTransform = `translateY(${position.y}px) translateX(${position.x}px) scale(${position.scale})`
-  const cameraRotation = `rotate(${position.rotation}deg)`
 
   if (!isVisible) return null
 
   return (
     <div
-      className="fixed top-20 right-8 z-50 pointer-events-none"
+      className="fixed z-50 pointer-events-none transition-all duration-500 ease-out"
       style={{
-        transform: cameraTransform,
-        transition: "opacity 0.8s ease-out, transform 0.3s ease-out",
+        top: `${position.y}px`,
+        right: `${position.x}px`,
+        transform: `rotate(${position.rotation}deg) scale(${position.scale})`,
       }}
     >
-      <div className="relative w-32 h-32 sm:w-40 sm:h-40" style={{ transform: cameraRotation }}>
+      <div className="relative w-28 h-28 sm:w-36 sm:h-36">
         <div
-          className={`absolute inset-0 rounded-full blur-xl animate-pulse ${
-            currentStage === "home"
-              ? "bg-gradient-to-br from-yellow-400/20 to-green-500/20"
-              : currentStage === "services"
-                ? "bg-gradient-to-br from-green-400/30 to-yellow-500/30"
-                : currentStage === "products"
-                  ? "bg-gradient-to-br from-yellow-500/40 to-green-600/40"
-                  : "bg-gradient-to-br from-yellow-400/20 to-green-500/20"
+          className={`absolute inset-0 rounded-full blur-xl animate-pulse transition-colors duration-500 ${
+            currentSection === "home"
+              ? "bg-gradient-to-br from-yellow-400/30 to-green-500/20"
+              : currentSection === "services"
+                ? "bg-gradient-to-br from-green-500/30 to-yellow-400/20"
+                : currentSection === "products"
+                  ? "bg-gradient-to-br from-yellow-500/40 to-green-600/30"
+                  : "bg-gradient-to-br from-green-600/50 to-yellow-500/40"
           }`}
         />
 
@@ -117,22 +117,33 @@ export function ScrollCamera() {
         />
 
         <div
-          className={`absolute -top-2 -right-2 w-4 h-4 rounded-full animate-ping ${
-            currentStage === "products" ? "bg-yellow-500" : "bg-yellow-400"
-          }`}
-        />
-        <div
-          className={`absolute -bottom-2 -left-2 w-3 h-3 rounded-full animate-pulse ${
-            currentStage === "services" ? "bg-green-600" : "bg-green-500"
+          className={`absolute -top-2 -right-2 w-4 h-4 rounded-full animate-ping transition-colors duration-500 ${
+            currentSection === "home"
+              ? "bg-yellow-400"
+              : currentSection === "services"
+                ? "bg-green-500"
+                : currentSection === "products"
+                  ? "bg-yellow-500"
+                  : "bg-green-600"
           }`}
         />
 
-        {/* Direction indicator for landing stage */}
-        {currentStage === "products" && (
-          <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-            <div className="w-2 h-8 bg-gradient-to-b from-yellow-400 to-transparent animate-bounce" />
-          </div>
-        )}
+        <div
+          className={`absolute -bottom-2 -left-2 w-3 h-3 rounded-full animate-pulse transition-colors duration-500 ${
+            currentSection === "home"
+              ? "bg-green-500"
+              : currentSection === "services"
+                ? "bg-yellow-400"
+                : currentSection === "products"
+                  ? "bg-green-600"
+                  : "bg-yellow-500"
+          }`}
+        />
+
+        {/* Direction indicator arrow */}
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+          <div className="w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent border-t-yellow-400 animate-bounce" />
+        </div>
       </div>
     </div>
   )
