@@ -46,6 +46,7 @@ const outdoorCameras = [
 
 export function OutdoorCameras() {
   const [isVisible, setIsVisible] = useState(false)
+  const [showScrollCamera, setShowScrollCamera] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -62,7 +63,20 @@ export function OutdoorCameras() {
       observer.observe(sectionRef.current)
     }
 
-    return () => observer.disconnect()
+    const handleScroll = () => {
+      const hikvisionBullet = document.querySelector('[data-camera="hikvision-bullet"]')
+      if (hikvisionBullet) {
+        const rect = hikvisionBullet.getBoundingClientRect()
+        const isInView = rect.top <= window.innerHeight && rect.bottom >= 0
+        setShowScrollCamera(isInView && window.scrollY > 1000)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
   return (
@@ -90,15 +104,24 @@ export function OutdoorCameras() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
+                  {camera.name === "Hikvision Bullet" && showScrollCamera && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-green-500/20 animate-pulse z-10 rounded-t-lg" />
+                  )}
                   <img
                     src={camera.image || "/placeholder.svg"}
                     alt={camera.name}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className={`w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300 ${
+                      camera.name === "Hikvision Bullet" && showScrollCamera ? "animate-bounce" : ""
+                    }`}
                   />
                   <div className="absolute top-4 left-4">
                     <Badge className="bg-accent text-accent-foreground">Outdoor</Badge>
                     {camera.name === "Hikvision Bullet" && (
-                      <Badge className="bg-yellow-400 text-yellow-900 ml-2 animate-pulse">Featured</Badge>
+                      <Badge
+                        className={`ml-2 ${showScrollCamera ? "bg-green-500 text-white animate-pulse" : "bg-yellow-400 text-yellow-900"}`}
+                      >
+                        {showScrollCamera ? "Active" : "Featured"}
+                      </Badge>
                     )}
                   </div>
                 </div>

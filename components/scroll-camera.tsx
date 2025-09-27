@@ -7,6 +7,7 @@ export function ScrollCamera() {
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
   const [currentSection, setCurrentSection] = useState("home")
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,39 +16,60 @@ export function ScrollCamera() {
 
       const servicesSection = document.getElementById("services")
       const productsSection = document.getElementById("products")
-      const outdoorSection = document.querySelector('[data-section="outdoor-cameras"]')
+      const hikvisionBullet = document.querySelector('[data-camera="hikvision-bullet"]')
 
-      if (servicesSection && productsSection && outdoorSection) {
+      if (servicesSection && productsSection && hikvisionBullet) {
         const servicesTop = servicesSection.offsetTop
         const productsTop = productsSection.offsetTop
-        const outdoorTop = outdoorSection.getBoundingClientRect().top + currentScrollY
-        const hikvisionBullet = document.querySelector('[data-camera="hikvision-bullet"]')
+        const hikvisionRect = hikvisionBullet.getBoundingClientRect()
+        const hikvisionTop = hikvisionRect.top + currentScrollY
 
         if (currentScrollY < servicesTop - 200) {
           setCurrentSection("home")
           setIsVisible(true)
+          setIsTransitioning(false)
         } else if (currentScrollY < productsTop - 200) {
           setCurrentSection("services")
           setIsVisible(true)
-        } else if (currentScrollY < outdoorTop - 100) {
+          setIsTransitioning(false)
+        } else if (currentScrollY < hikvisionTop - 100) {
           setCurrentSection("products")
           setIsVisible(true)
-        } else if (hikvisionBullet) {
-          // Hide scroll camera when reaching Hikvision Bullet position
+          setIsTransitioning(false)
+        } else {
           setCurrentSection("hikvision")
-          setIsVisible(false)
+          setIsTransitioning(true)
+
+          // Hide scroll camera after transition completes
+          setTimeout(() => {
+            setIsVisible(false)
+          }, 800)
         }
       }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
-    handleScroll() // Initial call
+    handleScroll()
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const getCameraPosition = () => {
     const baseSpeed = 0.3
     const horizontalMovement = Math.sin(scrollY * 0.008) * 30
+    const hikvisionBullet = document.querySelector('[data-camera="hikvision-bullet"]')
+
+    if (currentSection === "hikvision" && hikvisionBullet) {
+      const rect = hikvisionBullet.getBoundingClientRect()
+      const targetX = window.innerWidth - rect.right + rect.width / 2
+      const targetY = rect.top + rect.height / 2
+
+      return {
+        x: targetX,
+        y: targetY,
+        rotation: 0,
+        scale: 0.8,
+      }
+    }
 
     switch (currentSection) {
       case "home":
@@ -87,7 +109,9 @@ export function ScrollCamera() {
 
   return (
     <div
-      className="fixed z-50 pointer-events-none transition-all duration-500 ease-out"
+      className={`fixed z-50 pointer-events-none transition-all duration-800 ease-out ${
+        isTransitioning ? "opacity-0 scale-75" : "opacity-100"
+      }`}
       style={{
         top: `${position.y}px`,
         right: `${position.x}px`,
@@ -107,7 +131,6 @@ export function ScrollCamera() {
           }`}
         />
 
-        {/* Camera image */}
         <Image
           src="/security-camera-professional.png"
           alt="Security Camera"
